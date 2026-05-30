@@ -38,6 +38,7 @@ function App() {
         </button>
       </header>
 
+      {/* REMOVE THIS IN PROD */}
       {showDiagnostics && (
         <section className="diagnostics-overlay">
           <HealthDashboard />
