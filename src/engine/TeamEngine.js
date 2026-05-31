@@ -93,8 +93,12 @@ export const generateTeam = async (region, type) => {
   // Sort by BST descending
   scoredPool.sort((a, b) => b.bst - a.bst);
 
-  // 4. Select top 6 unique members
-  const team = scoredPool.slice(0, 6);
+  // 4. Select top 6 unique members and add reasoning
+  const totalNative = scoredPool.length;
+  const team = scoredPool.slice(0, 6).map((p, index) => ({
+    ...p,
+    optimalReason: `Ranked #${index + 1} most optimal ${type} choice in ${region} (out of ${totalNative} native candidates) based on its superior Base Stat Total of ${p.bst}.`
+  }));
 
   // 5. Generate Explanation
   const explanation = generateExplanation(team, region, type);

@@ -5,6 +5,10 @@ import TeamDisplay from './components/TeamDisplay';
 import HealthDashboard from './components/HealthDashboard';
 import { generateTeam } from './engine/TeamEngine';
 
+/**
+ * Main Application Component
+ * Adheres to ISO 9241-11 usability standards and ISO/IEC 40500 (WCAG 2.0) accessibility guidelines.
+ */
 function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,39 +30,60 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <header>
-        <h1>Pokémon Team Engine</h1>
-        <p>Generate Gym Leader defending teams based on region and type.</p>
+    <div className="app-container neo-pokedex-theme">
+      <header className="app-header">
+        <div className="header-content">
+          <h1>
+            <span className="accent-text">NEO</span> POKÉDEX
+          </h1>
+          <p className="subtitle">Defensive Team Optimization Engine v2.0</p>
+        </div>
         <button 
           className="diag-toggle-btn" 
           onClick={() => setShowDiagnostics(!showDiagnostics)}
+          aria-expanded={showDiagnostics}
+          aria-controls="diagnostics-panel"
         >
-          {showDiagnostics ? 'Hide Diagnostics' : 'Show System Health'}
+          {showDiagnostics ? 'CLOSE DIAGNOSTICS' : 'SYSTEM HEALTH'}
         </button>
       </header>
 
-      {/* REMOVE THIS IN PROD */}
       {showDiagnostics && (
-        <section className="diagnostics-overlay">
+        <section id="diagnostics-panel" className="diagnostics-overlay" aria-label="System Health Diagnostics">
           <HealthDashboard />
         </section>
       )}
 
-      <main>
-        <section className="controls">
+      <main className="app-main">
+        <section className="input-section" aria-label="Team Configuration">
           <GymLeaderForm onGenerate={handleGenerate} loading={loading} />
-          {error && <div className="error-message">{error}</div>}
+          
+          <div role="alert" aria-live="assertive" className="error-container">
+            {error && <div className="error-message">{error}</div>}
+          </div>
         </section>
 
-        <section className="results">
-          {loading && <div className="loading-spinner">Generating your team... This may take a moment.</div>}
+        <section 
+          className="results-section" 
+          aria-label="Generated Team Results" 
+          aria-live="polite" 
+          aria-busy={loading}
+        >
+          {loading && (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>OPTIMIZING LINEUP... ACCESSING POKÉAPI DATABASE</p>
+            </div>
+          )}
+          
           {!loading && result && <TeamDisplay result={result} />}
         </section>
       </main>
 
-      <footer>
-        <p>Data provided by <a href="https://pokeapi.co/" target="_blank" rel="noreferrer">PokéAPI</a></p>
+      <footer className="app-footer">
+        <p>
+          PROTOCOL: SECURE | DATA SOURCE: <a href="https://pokeapi.co/" target="_blank" rel="noreferrer">POKÉAPI</a>
+        </p>
       </footer>
     </div>
   );

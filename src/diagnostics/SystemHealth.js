@@ -37,7 +37,7 @@ const checkApiConnectivity = async () => {
       name: 'PokeAPI Connectivity',
       status: response.ok,
       latency,
-      message: response.ok ? 'Base URL reachable' : `HTTP ${response.status}`
+      message: response.ok ? 'Base URL reachable = ' : `HTTP ${response.status}`
     };
   } catch (error) {
     return {
@@ -64,7 +64,7 @@ const checkDataSchema = async () => {
       name: 'Data Schema Validation',
       status: isValid,
       latency,
-      message: isValid ? 'Schema matches expected structure' : 'Missing stats/types in response'
+      message: isValid ? 'Schema matches expected structure = ' : 'Missing stats/types in response'
     };
   } catch (error) {
     return {
