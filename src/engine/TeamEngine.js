@@ -1,5 +1,5 @@
-import { fetchPokemonByType, getFullPokemonData } from '../services/pokeApi';
-import { REGION_TO_GEN } from '../constants/pokemon';
+import { fetchPokemonByType, getFullPokemonData } from '../services/pokeApi.js';
+import { REGION_TO_GEN } from '../constants/pokemon.js';
 
 /**
  * @typedef {Object} TeamMember
@@ -65,7 +65,30 @@ export const generateTeam = async (region, type) => {
       return true;
     })
     .map(r => r.value)
-    .filter(p => p.species.generation.name === targetGen);
+    .filter(p => {
+      // 1. Basic Generation Filter
+      if (p.species.generation.name !== targetGen) return false;
+
+      // 2. Battle Restrictions (Pokémon Day Compliance)
+      
+      // Exclude Legendaries and Mythicals
+      if (p.species.is_legendary || p.species.is_mythical) return false;
+
+      // Exclude special forms: Mega Evolution, Gigantamax, and Terastallization
+      const restrictedFormSuffixes = ['-mega', '-gmax', '-tera'];
+      if (restrictedFormSuffixes.some(suffix => p.details.name.toLowerCase().includes(suffix))) {
+        return false;
+      }
+
+      // Exclude Paradox Pokémon (identified by Protosynthesis or Quark Drive abilities)
+      const paradoxAbilities = ['protosynthesis', 'quark-drive'];
+      const hasParadoxAbility = p.details.abilities.some(a => 
+        paradoxAbilities.includes(a.ability.name.toLowerCase())
+      );
+      if (hasParadoxAbility) return false;
+
+      return true;
+    });
 
   if (nativePool.length === 0) {
     throw new Error(`No native ${type} Pokémon found in ${region}.`);
@@ -123,7 +146,7 @@ const generateExplanation = (team, region, type) => {
   const avgBst = Math.round(team.reduce((acc, p) => acc + p.bst, 0) / team.length);
   const strongest = team[0].displayName;
   
-  return `This ${type}-type lineup for ${region} was algorithmically selected from a native pool of ${team.length} candidates. ` +
+  return `This ${type}-type lineup for ${region} was algorithmically selected from a native pool of ${team.length} candidates, excluding all Legendaries, Mythicals, and restricted battle forms to ensure full compliance with Pokémon Day battle restrictions. ` +
          `The selection priority was based on Base Stat Total (BST) to ensure a high-performance defending team. ` +
          `The resulting squad maintains an average BST of ${avgBst}, anchored by ${strongest}. ` +
          `Network requests were throttled to ensure data integrity during generation.`;
